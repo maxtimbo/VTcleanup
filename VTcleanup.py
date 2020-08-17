@@ -405,40 +405,6 @@ class quickSetup(tk.Toplevel):
             fileDict[x] = k
         fin = fini
         fin.progress(fileDict)
-        #popup = tk.Toplevel()
-        #albl = ttk.Label(popup, text="Files are being uploaded").pack()
-        #progress = 0
-        #progress_var = tk.DoubleVar()
-        #progress_bar = ttk.Progressbar(popup, variable=progress_var, maximum=100)
-        #progress_bar.pack()
-        #files = {}
-        #g = f'{gloVars.station}/AUDIO/{gloVars.cart}'
-        #progress_bar.start()
-        #for x in gloVars.fileSelection:
-        #    k = x.replace("SP", gloVars.cart)
-        #    files[f'{g}/{x}'] = f'{gloVars.exportDir}/{k}'
-        #k = files.keys()
-        #v = files.values()
-        ### Putting a pin in it tonight. Need to use concurrent.futures rather than threading
-        ### make operation() require two arguments and only do one thing at a time.
-        #def operation():
-
-        #    time.sleep(1)
-        #    if messagebox.showinfo(title="Done", message="yeah") == "ok":
-        #        root.destroy()
-
-        #    #try:
-        #    #    for x in files:
-        #    #        time.sleep(1)
-        #    #       #shutil.copy2(x, files[x])
-        #    #    if messagebox.showinfo(title="Done", message="Operation Successful!") == "ok":
-        #    #        stop_threading.set()
-        #    #        root.destroy()
-        #    #except:
-        #    #    messagebox.showerror(title="Error", message="Something went wrong.\nCheck your settings and connections.")
-        #    progress_bar.stop()
-        #    return 0
-        #threading.Thread(target=operation).start()
 
     def init_check_root(self):
         if not os.path.isdir(gloVars.rootDir):
