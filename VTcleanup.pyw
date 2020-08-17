@@ -8,18 +8,20 @@ import configparser
 import threading
         
 class gloVars:
-    cnf = configparser.ConfigParser()
-    cnfExist = False
-    rootDir = 'C:/RemoteVT'
-    station = '' 
-    cart = ''
-    fileList = {}
-    fileSelection = []
-    exportDir = ''
-    todayFlag = 0
-    todayTest = False
-    today = datetime.date.today().strftime('%m/%d/%Y')
-    seconds = 0
+## Global Variables are stored here and manipulated across other classes.
+    cnf = configparser.ConfigParser()                   # Initialize ConfigParser
+    cnfExist = False                                    # config file flag
+    rootDir = 'C:/RemoteVT'                             # Default Root directory
+    station = ''                                        # Station String
+    cart = ''                                           # cart string
+    fileList = {}                                       # file list dict
+    fileSelection = []                                  # file selection list (spxxxx.wav)
+    exportDir = ''                                      # export directory string
+    todayFlag = 0                                       # Today flag, according to config file
+    todayTest = False                                   # If Today flag is '1', checks if any
+                                                        # files were actually modified 'today'
+    today = datetime.date.today().strftime('%m/%d/%Y')  # sets 'today' date
+    seconds = 0                                         # I don't remember what this is for
 
     @classmethod
     def updateDict(self):
@@ -120,7 +122,6 @@ class Step1(ttk.Frame):
                 self.cartListDisp.insert(tk.END, "Invalid Selection")
                 station = "invalid selection"
             gloVars.station = station
-            #Step3.refresh_()
 
 class Step3(ttk.Frame):
 ## Dates and file selection screen
@@ -281,10 +282,8 @@ class Step4(ttk.Frame):
         self.seconds = 0
         self.var = tk.StringVar()
         self.show_final = tk.Message(self, textvariable=self.var, anchor="nw", width="400")
-        #self.show_final = tk.Text(self)
         self.show_final.pack()
         self.show_final.after(1000, self.populate)
-        #self.populate(self.show_final)
     
     def populate(self):
         files = {}
@@ -312,14 +311,7 @@ class fini:
         progress_bar.start()
         def operation(src, dest):
             threads = []
-            #labels = []
-            #progs = []
             for x, y in zip(src, dest):
-                #labels.append(ttk.Label(popup, text=f'Copying {x}\nTo:{y}'))
-                #labels[-1].pack()
-                #progs.append(ttk.Progressbar(popup))
-                #progs[-1].pack(expand=True, fill="x", padx=20)
-                #progs[-1].start()
                 threads.append(threading.Thread(target=cls._copy, args=(x, y)))
                 threads[-1].start()
 
