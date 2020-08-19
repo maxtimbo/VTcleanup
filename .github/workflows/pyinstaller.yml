@@ -1,0 +1,51 @@
+name: PyInstaller
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+    - name: build with pyinstaller
+      run: |
+        pyinstaller VTcleanup.pyw
+
+exec(code, run_globals)
+  File "C:\hostedtoolcache\windows\Python\3.8.0\x64\Scripts\pyinstaller.exe\ __main__.py", line 7, in <module>
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\ __main__.py", line 111, in run
+    run_build(pyi_config, spec_file, **vars(args))
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\ __main__.py", line 63, in run_build
+    PyInstaller.building.build_main.main(pyi_config, spec_file, **kwargs)
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\build_main.py", line 844, in main
+    build(specfile, kw.get('distpath'), kw.get('workpath'), kw.get('clean_build'))
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\build_main.py", line 791, in build
+    exec(code, spec_namespace)
+  File "D:\a\Test\Test\arbeitszeit.spec", line 18, in <module>
+    pyz = PYZ(a.pure, a.zipped_data,
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\api.py", line 98, in __init__
+    self. __postinit__ ()
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\datastruct.py", line 158, in __postinit__
+    self.assemble()
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\api.py", line 128, in assemble
+    self.code_dict = {
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\api.py", line 129, in <dictcomp>
+    key: strip_paths_in_code(code)
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\utils.py", line 652, in strip_paths_in_code
+    consts = tuple(
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\utils.py", line 653, in <genexpr>
+    strip_paths_in_code(const_co, new_filename)
+  File "c:\hostedtoolcache\windows\python\3.8.0\x64\lib\site-packages\PyInstaller\building\utils.py", line 660, in strip_paths_in_code
+    return code_func(co.co_argcount, co.co_kwonlyargcount, co.co_nlocals, co.co_stacksize,
+TypeError: an integer is required (got type bytes)
+##[error]Process completed with exit code 1.
