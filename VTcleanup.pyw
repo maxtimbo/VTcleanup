@@ -1,27 +1,24 @@
 import tkinter as tk
 import tkinter.filedialog
 from tkinter import ttk
-from tkinter import messagebox
-from tkinter import simpledialog
+from tkinter import messagebox as ms
 import os, shutil, datetime, time
 import configparser
 import threading
         
 class gloVars:
-## Global Variables are stored here and manipulated across other classes.
-    cnf = configparser.ConfigParser()                   # Initialize ConfigParser
-    cnfExist = False                                    # config file flag
-    rootDir = 'C:/RemoteVT'                             # Default Root directory
-    station = ''                                        # Station String
-    cart = ''                                           # cart string
-    fileList = {}                                       # file list dict
-    fileSelection = []                                  # file selection list (spxxxx.wav)
-    exportDir = ''                                      # export directory string
-    todayFlag = 0                                       # Today flag, according to config file
-    todayTest = False                                   # If Today flag is '1', checks if any
-                                                        # files were actually modified 'today'
-    today = datetime.date.today().strftime('%m/%d/%Y')  # sets 'today' date
-    seconds = 0                                         # I don't remember what this is for
+    cnf = configparser.ConfigParser()                   
+    cnfExist = False                                    
+    rootDir = 'C:/RemoteVT'
+    station = ''           
+    cart = ''              
+    fileList = {}          
+    fileSelection = []     
+    exportDir = ''         
+    todayFlag = 0          
+    todayTest = False      
+    today = datetime.date.today().strftime('%m/%d/%Y')  
+    seconds = 0                                         
 
     @classmethod
     def updateDict(self):
@@ -179,7 +176,7 @@ class Step3(ttk.Frame):
                         if self.dates_list.get(x) == gloVars.today:
                             self.dates_list.selection_set(x)
                     if not gloVars.todayTest:
-                        messagebox.showwarning(title="Today not present", message="""Files modified today are not present.\nThis likely means that either you've not voice tracked today, or something else went wrong.\nYou can add other dates and files here.""")
+                        ms.showwarning(title="Today not present", message="""Files modified today are not present.\nThis likely means that either you've not voice tracked today, or something else went wrong.\nYou can add other dates and files here.""")
                     else:
                         fileValues = gloVars.fileList[gloVars.today]
                         for file_list_iter in range(self.files_list.size()):
@@ -329,10 +326,9 @@ class fini:
         try:
             shutil.copy2(fullsrc, fulldest)
         except Exception as e:
-            messagebox.showerror(title="Something Went Wrong", message=f'The file {src} did not upload correctly. Check your connection first.\n{e}')
+            ms.showerror(title="Something Went Wrong", message=f'The file {src} did not upload correctly. Check your connection first.\n{e}')
 
 class quickSetup(tk.Toplevel):
-    x = 0
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
@@ -349,8 +345,10 @@ class quickSetup(tk.Toplevel):
         self.next_btn = ttk.Button(self.button_frame, text="Next >>", command=self.clickNext)
         self.fini_btn = ttk.Button(self.button_frame, text="Finish", command=self.clickFini)
 
+        # I don't think this does anything 
         self.stop_thread = threading.Event()
 
+        self.x = 0
         if gloVars.cnfExist:
             self.x += 2
             if gloVars.todayFlag == 1:
@@ -400,7 +398,7 @@ class quickSetup(tk.Toplevel):
 
     def init_check_root(self):
         if not os.path.isdir(gloVars.rootDir):
-            if messagebox.askyesno(title="Could not find RemoteVT", message="""Could not find C:\\RemoteVT. This could mean that RemoteVT software is not installed. Or it means that RemoteVT is installed in a non-standard location. Would you like to specify a different Directory for RemoteVT?"""):
+            if ms.askyesno(title="Could not find RemoteVT", message="""Could not find C:\\RemoteVT. This could mean that RemoteVT software is not installed. Or it means that RemoteVT is installed in a non-standard location. Would you like to specify a different Directory for RemoteVT?"""):
                 rootDir = tk.filedialog.askdirectory(title="Select RemoteVT Root")
                 gloVars.rootDir = rootDir
 
