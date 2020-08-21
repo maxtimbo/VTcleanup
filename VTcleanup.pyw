@@ -54,6 +54,14 @@ class Step1(ttk.Frame):
 ## Station and Cart Select
     def __init__(self, parent, *args, **kwargs):
         ttk.Frame.__init__(self, parent, *args, **kwargs)
+
+        ins_var = tk.StringVar()
+        ins_var.set("""Please select a station. Once you have selected a station, the carts will automatically propogate. You must choose the correct cart number which has your voice tracks. Typically, this starts with \'VT\'. For example \'VT3\' may appear below.""")
+        instructions = ttk.Frame(self)
+        instructions.pack(side="top", fill="both", expand=True)
+
+        ins_lbl = tk.Message(instructions, textvariable=ins_var)
+        ins_lbl.pack(fill="both", expand=True)
         
         leftFrame = ttk.Frame(self)
         leftFrame.pack(side="left", fill="x", expand=True)
@@ -120,6 +128,76 @@ class Step1(ttk.Frame):
                 station = "invalid selection"
             gloVars.station = station
 
+                       
+class Step2(ttk.Frame):
+## Export Folder, set 'today' flag, save and display cnf
+    def __init__(self, parent, *args, **kwargs):
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
+        self.parent = parent
+        self.exportDir = tk.StringVar()
+        self.todayVar = tk.IntVar()
+        self.checkGlos()
+
+        head_btns = ttk.Frame(self)
+        head_btns.pack(side="top", fill="both", expand=True)
+        foot = ttk.Frame(self)
+        foot.pack(side="top", fill="both", expand=True)
+
+        ins_var = tk.StringVar()
+        ins_var.set("""Select the folder in which you wish to export or upload the files to. You may also set the \'Today\' flag and save your configuration for future use.\nWhen VTcleanup finds that you have a saved configuration, it will skip this setup. You may still press the back button if you wish to reconfigure. """)
+
+        instructions = tk.Message(head_btns, textvariable=ins_var)
+        instructions.pack(side="top", fill="both", expand=True)
+        sel_export_lbl = ttk.Label(head_btns, text="Select Export Folder: ")
+        sel_export_lbl.pack(side="top", fill="both", expand=True)
+       
+        exportDisplay = ttk.Entry(head_btns, textvariable=self.exportDir)
+        exportDisplay.pack(side="left", fill="x", expand=True)
+
+        exportSelbtn = ttk.Button(head_btns, text="Choose Folder", command=self.exportSel_click)
+        exportSelbtn.pack(side="right", fill="x")
+
+        cnfNotes = ttk.Label(foot, text="""
+        You can save the configuration to always run the selected station and cart.
+        You can also choose to always find files modified \'today\'""")
+        cnfNotes.pack()
+
+        self.todayFlag = ttk.Checkbutton(foot, text="Set \'Today\' Flag", variable=self.todayVar, command=self.updateGlo)
+        self.todayFlag.pack()
+        self.todayFlag.todayVar = self.todayVar
+
+        self.savebtn = ttk.Button(foot, text="Save Config", command=self.clickSave)
+        self.savebtn.pack(side="right")
+
+    def updateGlo(self):
+        gloVars.todayFlag = self.todayVar.get()
+
+    def exportSel_click(self):
+        exDir = tk.filedialog.askdirectory(title="Select Export Directory")
+        if os.path.isdir(exDir):
+            self.exportDir.set(exDir)
+            gloVars.exportDir = exDir
+        else:
+            pass
+
+    def checkGlos(self):
+        if gloVars.cnfExist:
+            self.exportDir.set(gloVars.exportDir)
+            if gloVars.todayFlag == 1:
+                self.todayVar.set(1)
+            else:
+                self.todayVar.set(0)
+
+    def clickSave(self):
+        ini_file = f'{gloVars.rootDir}/vt_export_cnf.ini'
+        with open(ini_file, 'w') as f:
+            f.write(f'[{os.path.basename(gloVars.station)}]\n')
+            f.write(f'cart = {gloVars.cart}\n')
+            f.write(f'fullpath = \"{gloVars.station}/AUDIO/{gloVars.cart}\"\n')
+            f.write(f'today = {gloVars.todayFlag}\n')
+            f.write(f'exportpath = \"{gloVars.exportDir}\"\n')
+        self.savebtn.config(text="done", state="disabled")
+
 class Step3(ttk.Frame):
 ## Dates and file selection screen
     def __init__(self, parent, *args, **kwargs):
@@ -129,6 +207,10 @@ class Step3(ttk.Frame):
 
         self.stationVar = tk.StringVar()
         self.cartVar = tk.StringVar()
+        ins_var = tk.StringVar()
+        ins_var.set("""Here, the VTcleanup has propogated a list of available files, and the dates in which those files were modified. You can select the date you wish to export on the left. The files selected will highlight on the right. You can select additional files or deselect files for finer grained selection. """)
+        instructions = tk.Message(self, textvariable=ins_var)
+        instructions.pack(side="top", fill="both", expand=True)
         header = ttk.Label(self, text="Select date (based on modification date): ")
         header.pack(side="top", fill="both", expand=True)
        
@@ -207,69 +289,6 @@ class Step3(ttk.Frame):
                 gloVars.add_to_selection(self.files_list.get(i))
             else:
                 pass
-                       
-class Step2(ttk.Frame):
-## Export Folder, set 'today' flag, save and display cnf
-    def __init__(self, parent, *args, **kwargs):
-        ttk.Frame.__init__(self, parent, *args, **kwargs)
-        self.parent = parent
-        self.exportDir = tk.StringVar()
-        self.todayVar = tk.IntVar()
-        self.checkGlos()
-
-        head_btns = ttk.Frame(self)
-        head_btns.pack(side="top", fill="both", expand=True)
-        foot = ttk.Frame(self)
-        foot.pack(side="top", fill="both", expand=True)
-        header = ttk.Label(head_btns, text="Select Export Folder: ")
-        header.pack(side="top", fill="both", expand=True)
-       
-        exportDisplay = ttk.Entry(head_btns, textvariable=self.exportDir)
-        exportDisplay.pack(side="left", fill="x", expand=True)
-
-        exportSelbtn = ttk.Button(head_btns, text=". . .", command=self.exportSel_click)
-        exportSelbtn.pack(side="right", fill="x")
-
-        cnfNotes = ttk.Label(foot, text="""
-        You can save the configuration to always run the selected station and cart.
-        You can also choose to always find files modified \'today\'""")
-        cnfNotes.pack()
-
-        self.todayFlag = ttk.Checkbutton(foot, text="Set \'Today\' Flag", variable=self.todayVar, command=self.updateGlo)
-        self.todayFlag.pack()
-        self.todayFlag.todayVar = self.todayVar
-
-        self.savebtn = ttk.Button(foot, text="Save Config", command=self.clickSave)
-        self.savebtn.pack(side="right")
-
-    def updateGlo(self):
-        gloVars.todayFlag = self.todayVar.get()
-
-    def exportSel_click(self):
-        exDir = tk.filedialog.askdirectory(title="Select Export Directory")
-        if os.path.isdir(exDir):
-            self.exportDir.set(exDir)
-            gloVars.exportDir = exDir
-        else:
-            pass
-
-    def checkGlos(self):
-        if gloVars.cnfExist:
-            self.exportDir.set(gloVars.exportDir)
-            if gloVars.todayFlag == 1:
-                self.todayVar.set(1)
-            else:
-                self.todayVar.set(0)
-
-    def clickSave(self):
-        ini_file = f'{gloVars.rootDir}/vt_export_cnf.ini'
-        with open(ini_file, 'w') as f:
-            f.write(f'[{os.path.basename(gloVars.station)}]\n')
-            f.write(f'cart = {gloVars.cart}\n')
-            f.write(f'fullpath = \"{gloVars.station}/AUDIO/{gloVars.cart}\"\n')
-            f.write(f'today = {gloVars.todayFlag}\n')
-            f.write(f'exportpath = \"{gloVars.exportDir}\"\n')
-        self.savebtn.config(text="done", state="disabled")
 
 class Step4(ttk.Frame):
 ## Show final command and run
@@ -281,6 +300,8 @@ class Step4(ttk.Frame):
         self.show_final = tk.Message(self, textvariable=self.var, anchor="nw", width="400")
         self.show_final.pack()
         self.show_final.after(1000, self.populate)
+        fini_lbl = ttk.Label(self, text="Press Finish to perfom the operation")
+        fini_lbl.pack(side="right")
     
     def populate(self):
         files = {}
@@ -289,7 +310,7 @@ class Step4(ttk.Frame):
         for x in gloVars.fileSelection:
             k = x.replace("SP", gloVars.cart)
             files[f'From: {g}/{x}'] = f'\tTo:  {gloVars.exportDir}/{k}'
-        self.var.set(f'Files to be copied:\n{s.join(c for kv in files.items() for c in kv)}')
+        self.var.set(f'This pane shows the actions which will take place when you press \'Finish\'\n\nFiles to be copied:\n{s.join(c for kv in files.items() for c in kv)}')
         self.seconds += 1
         self.show_final.after(1000, self.populate)
 
@@ -389,12 +410,8 @@ class quickSetup(tk.Toplevel):
         self.show_step(self.current_step + 1)
 
     def clickFini(self):
-        fileDict = {}
-        for x in gloVars.fileSelection:
-            k = x.replace("SP", gloVars.cart)
-            fileDict[x] = k
-        fin = fini
-        fin.progress(fileDict)
+        fileDict = {x: x.replace('SP', gloVars.cart) for x in gloVars.fileSelection}
+        fini.progress(fileDict)
 
     def init_check_root(self):
         if not os.path.isdir(gloVars.rootDir):
